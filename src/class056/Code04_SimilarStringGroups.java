@@ -65,4 +65,9 @@ public class Code04_SimilarStringGroups {
 		return sets;
 	}
 
+	public static void main(String[] args) {
+		String[] s = { "mov", "mvo" };
+		System.out.println(Code04_SimilarStringGroups.numSimilarGroups(s));
+	}
+
 }
