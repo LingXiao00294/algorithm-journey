@@ -1,7 +1,16 @@
 package class143;
 
 // 跳楼机
+// 一座大楼一共有h层，楼层编号1~h，有如下四种移动方式
+// 1, 向上移动x层
+// 2, 向上移动y层
+// 3, 向上移动z层
+// 4, 回到1层
+// 假设你正在第1层，请问大楼里有多少楼层你可以到达
+// 1 <= h <= 2^63 - 1
+// 1 <= x、y、z <= 10^5
 // 测试链接 : https://www.luogu.com.cn/problem/P3403
+// 提交以下的code，提交时请把类名改成"Main"，可以通过所有测试用例
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -36,6 +45,8 @@ public class Code01_Elevator {
 	public static int cnt;
 
 	// dijkstra算法需要
+	// 0 : 当前节点
+	// 1 : 源点到当前点距离
 	public static PriorityQueue<long[]> heap = new PriorityQueue<>((a, b) -> a[1] <= b[1] ? -1 : 1);
 
 	public static long[] distance = new long[MAXN];
@@ -57,27 +68,17 @@ public class Code01_Elevator {
 		head[u] = cnt++;
 	}
 
-	public static long compute() {
-		dijkstra();
-		long ans = 0;
-		for (int i = 0; i < x; i++) {
-			if (distance[i] <= h) {
-				ans += (h - distance[i]) / x + 1;
-			}
-		}
-		return ans;
-	}
-
+	// 来自讲解064，dijkstra算法
 	public static void dijkstra() {
 		heap.add(new long[] { 0, 0 });
 		distance[0] = 0;
-		long[] curData;
+		long[] cur;
 		int u;
 		long w;
 		while (!heap.isEmpty()) {
-			curData = heap.poll();
-			u = (int) curData[0];
-			w = curData[1];
+			cur = heap.poll();
+			u = (int) cur[0];
+			w = cur[1];
 			if (visited[u]) {
 				continue;
 			}
@@ -90,6 +91,17 @@ public class Code01_Elevator {
 				}
 			}
 		}
+	}
+
+	public static long compute() {
+		dijkstra();
+		long ans = 0;
+		for (int i = 0; i < x; i++) {
+			if (distance[i] <= h) {
+				ans += (h - distance[i]) / x + 1;
+			}
+		}
+		return ans;
 	}
 
 	public static void main(String[] args) throws IOException {

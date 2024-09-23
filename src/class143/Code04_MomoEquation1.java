@@ -1,7 +1,14 @@
 package class143;
 
-// 墨墨的等式
+// 墨墨的等式(dijkstra算法)
+// 一共有n种正数，每种数可以选择任意个，个数不能是负数
+// 那么一定有某些数值可以由这些数字累加得到
+// 请问在[l...r]范围上，有多少个数能被累加得到
+// 0 <= n <= 12
+// 0 <= 数值范围 <= 5 * 10^5
+// 1 <= l <= r <= 10^12
 // 测试链接 : https://www.luogu.com.cn/problem/P2371
+// 提交以下的code，提交时请把类名改成"Main"，可以通过所有测试用例
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +19,7 @@ import java.io.StreamTokenizer;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
-public class Code02_MomoEquation {
+public class Code04_MomoEquation1 {
 
 	public static int MAXN = 500001;
 
@@ -34,6 +41,8 @@ public class Code02_MomoEquation {
 	public static int cnt;
 
 	// dijkstra算法需要
+	// 0 : 当前节点
+	// 1 : 源点到当前点距离
 	public static PriorityQueue<long[]> heap = new PriorityQueue<>((a, b) -> a[1] <= b[1] ? -1 : 1);
 
 	public static long[] distance = new long[MAXN];
@@ -55,30 +64,16 @@ public class Code02_MomoEquation {
 		head[u] = cnt++;
 	}
 
-	public static long compute() {
-		dijkstra();
-		long ans = 0;
-		for (int i = 0; i < x; i++) {
-			if (r >= distance[i]) {
-				ans += (r - distance[i]) / x + 1;
-			}
-			if (l >= distance[i]) {
-				ans -= (l - distance[i]) / x + 1;
-			}
-		}
-		return ans;
-	}
-
 	public static void dijkstra() {
 		heap.add(new long[] { 0, 0 });
 		distance[0] = 0;
-		long[] curData;
+		long[] cur;
 		int u;
 		long w;
 		while (!heap.isEmpty()) {
-			curData = heap.poll();
-			u = (int) curData[0];
-			w = curData[1];
+			cur = heap.poll();
+			u = (int) cur[0];
+			w = cur[1];
 			if (visited[u]) {
 				continue;
 			}
@@ -91,6 +86,20 @@ public class Code02_MomoEquation {
 				}
 			}
 		}
+	}
+
+	public static long compute() {
+		dijkstra();
+		long ans = 0;
+		for (int i = 0; i < x; i++) {
+			if (r >= distance[i]) {
+				ans += (r - distance[i]) / x + 1;
+			}
+			if (l >= distance[i]) {
+				ans -= (l - distance[i]) / x + 1;
+			}
+		}
+		return ans;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -106,11 +115,11 @@ public class Code02_MomoEquation {
 		in.nextToken();
 		x = (int) in.nval;
 		prepare();
-		for (int i = 1, y; i < n; i++) {
+		for (int i = 2, vi; i <= n; i++) {
 			in.nextToken();
-			y = (int) in.nval;
+			vi = (int) in.nval;
 			for (int j = 0; j < x; j++) {
-				addEdge(j, (j + y) % x, y);
+				addEdge(j, (j + vi) % x, vi);
 			}
 		}
 		out.println(compute());

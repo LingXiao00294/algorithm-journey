@@ -1,7 +1,16 @@
 package class143;
 
 // 牛场围栏
+// 给定一个长度为n的数组arr, arr[i]代表第i种木棍的长度，每种木棍有无穷多个
+// 给定一个正数m，表示你可以把任何一根木棍消去最多m的长度，同一种木棍可以消去不同的长度
+// 你可以随意拼接木棍形成一个长度，返回不能拼出来的长度中，最大值是多少
+// 如果你可以拼出所有的长度，返回-1
+// 如果不能拼出来的长度有无穷多，返回-1
+// 1 <= n <= 100
+// 1 <= arr[i] <= 3000
+// 1 <= m <= 3000
 // 测试链接 : https://www.luogu.com.cn/problem/P2662
+// 提交以下的code，提交时请把类名改成"Main"，可以通过所有测试用例
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +21,7 @@ import java.io.StreamTokenizer;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
-public class Code03_CattleFence {
+public class Code02_CattleFence {
 
 	public static int MAXN = 101;
 
@@ -40,6 +49,8 @@ public class Code03_CattleFence {
 	public static int cnt;
 
 	// dijkstra算法需要
+	// 0 : 当前节点
+	// 1 : 源点到当前点距离
 	public static PriorityQueue<int[]> heap = new PriorityQueue<>((a, b) -> a[1] - b[1]);
 
 	public static int[] distance = new int[MAXV];
@@ -62,15 +73,16 @@ public class Code03_CattleFence {
 		head[u] = cnt++;
 	}
 
+	// 来自讲解064，dijkstra算法
 	public static void dijkstra() {
 		heap.add(new int[] { 0, 0 });
 		distance[0] = 0;
-		int[] curData;
+		int[] cur;
 		int u, w;
 		while (!heap.isEmpty()) {
-			curData = heap.poll();
-			u = (int) curData[0];
-			w = curData[1];
+			cur = heap.poll();
+			u = (int) cur[0];
+			w = cur[1];
 			if (visited[u]) {
 				continue;
 			}

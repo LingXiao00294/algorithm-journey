@@ -21,7 +21,7 @@ public class Code05_ConcatenationAllWords {
 	// 所有题解都没有做到这个复杂度的
 	// 虽然这个做法打败比例没有到100%，但那是因为测试数据量不够大
 	// 所以最优解的时间复杂度优势没有体现出来
-	// 这个方法绝对是最优解，只有用字符串哈希，时间复杂度才能到最优
+	// 这个方法绝对是最优解，只有同余分组 + 字符串哈希，时间复杂度才能到最优
 	public static List<Integer> findSubstring(String s, String[] words) {
 		List<Integer> ans = new ArrayList<>();
 		if (s == null || s.length() == 0 || words == null || words.length == 0) {
@@ -40,7 +40,7 @@ public class Code05_ConcatenationAllWords {
 		int allLen = wordLen * wordNum;
 		// 窗口的词频表
 		HashMap<Long, Integer> window = new HashMap<>();
-		for (int init = 0; init < wordLen && init + allLen <= n; init++) {
+		for (int init = 0; init < wordLen && init + allLen <= n; init++) { // 同余分组
 			// init是当前组的首个开头
 			int debt = wordNum;
 			// 建立起窗口
