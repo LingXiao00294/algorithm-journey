@@ -1,7 +1,14 @@
 package class145;
 
 // 集合计数
+// 一共有n个不同的数，能构成2^n个不同集合
+// 在2^n个集合中挑出若干个集合，至少挑一个
+// 希望这若干个集合的交集，正好有k个数
+// 返回挑选集合的方案数，答案对 1000000007 取模
+// 1 <= n <= 10^6
+// 0 <= k <= n
 // 测试链接 : https://www.luogu.com.cn/problem/P10596
+// 提交以下的code，提交时请把类名改成"Main"，可以通过所有测试用例
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,8 +32,6 @@ public class Code02_SetCounting {
 	public static int n, k;
 
 	public static void build() {
-		// 一般情况下，不用计算0!的余数表和逆元表
-		// 但是这道题需要，所以单独设置一下
 		fac[0] = inv[0] = 1;
 		fac[1] = 1;
 		for (int i = 2; i <= n; i++) {
@@ -57,19 +62,21 @@ public class Code02_SetCounting {
 	public static long compute() {
 		build();
 		long tmp = 2;
-		for (int i = n; i >= k; i--) {
-			g[i] = (tmp + MOD - 1) % MOD;
-			tmp = (tmp * tmp) % MOD;
+		for (int i = n; i >= 0; i--) {
+			g[i] = tmp;
+			tmp = tmp * tmp % MOD;
 		}
-		for (int i = n; i >= k; i--) {
-			g[i] = (c(n, i) * g[i]) % MOD;
+		for (int i = 0; i <= n; i++) {
+			// -1 和 (MOD-1) 同余
+			g[i] = (g[i] + MOD - 1) * c(n, i) % MOD;
 		}
 		long ans = 0;
 		for (int i = k; i <= n; i++) {
 			if (((i - k) & 1) == 0) {
-				ans = (ans + ((c(i, k) * g[i]) % MOD)) % MOD;
+				ans = (ans + c(i, k) * g[i] % MOD) % MOD;
 			} else {
-				ans = (ans + (((((long) (MOD - 1) * c(i, k)) % MOD) * g[i]) % MOD)) % MOD;
+				// -1 和 (MOD-1) 同余
+				ans = (ans + c(i, k) * g[i] % MOD * (MOD - 1) % MOD) % MOD;
 			}
 		}
 		return ans;

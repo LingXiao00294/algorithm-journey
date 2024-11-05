@@ -1,7 +1,19 @@
 package class145;
 
 // 已经没有什么好害怕的了
+// 给定两个长度为n的数组，a[i]表示第i个糖果的能量，b[i]表示第i个药片的能量
+// 所有能量数值都不相同，每一个糖果要选一个药片进行配对
+// 如果配对之后，糖果能量 > 药片能量，称为糖果大的配对
+// 如果配对之后，糖果能量 < 药片能量，称为药片大的配对
+// 希望做到，糖果大的配对数量 = 药片大的配对数量 + k
+// 返回配对方法数，答案对 1000000009 取模
+// 举例，a = [5, 35, 15, 45]，b = [40, 20, 10, 30]，k = 2，返回4，因为有4种配对方法
+// (5-40，35-20，15-10，45-30)、(5-40，35-30，15-10，45-20)
+// (5-20，35-30，15-10，45-40)、(5-30，35-20，15-10，45-40)
+// 1 <= n <= 2000
+// 0 <= k <= n
 // 测试链接 : https://www.luogu.com.cn/problem/P4859
+// 提交以下的code，提交时请把类名改成"Main"，可以通过所有测试用例
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +23,7 @@ import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.util.Arrays;
 
-public class Code03_NothingFear {
+public class Code04_NothingFear {
 
 	public static int MAXN = 2001;
 
@@ -27,9 +39,11 @@ public class Code03_NothingFear {
 
 	public static long[][] c = new long[MAXN][MAXN];
 
-	public static long[] near = new long[MAXN];
+	public static long[] small = new long[MAXN];
 
-	public static long[][] g = new long[MAXN][MAXN];
+	public static long[][] dp = new long[MAXN][MAXN];
+
+	public static long[] g = new long[MAXN];
 
 	public static void build() {
 		fac[0] = 1;
@@ -45,32 +59,32 @@ public class Code03_NothingFear {
 	}
 
 	public static long compute() {
-		if ((n + k) % 2 != 0) {
-			return 0;
-		}
-		k = (n + k) / 2;
 		build();
 		Arrays.sort(a, 1, n + 1);
 		Arrays.sort(b, 1, n + 1);
-		for (int i = 1, find = 0; i <= n; i++) {
-			while (find + 1 <= n && b[find + 1] < a[i]) {
-				find++;
+		for (int i = 1, cnt = 0; i <= n; i++) {
+			while (cnt + 1 <= n && b[cnt + 1] < a[i]) {
+				cnt++;
 			}
-			near[i] = find;
+			small[i] = cnt;
 		}
-		g[0][0] = 1;
+		dp[0][0] = 1;
 		for (int i = 1; i <= n; i++) {
-			g[i][0] = g[i - 1][0];
+			dp[i][0] = dp[i - 1][0];
 			for (int j = 1; j <= i; j++) {
-				g[i][j] = (g[i - 1][j] + g[i - 1][j - 1] * Math.max(0, near[i] - j + 1) % MOD) % MOD;
+				dp[i][j] = (dp[i - 1][j] + dp[i - 1][j - 1] * (small[i] - j + 1) % MOD) % MOD;
 			}
+		}
+		for (int i = 0; i <= n; i++) {
+			g[i] = fac[n - i] * dp[n][i] % MOD;
 		}
 		long ans = 0;
 		for (int i = k; i <= n; i++) {
-			if ((i - k) % 2 == 0) {
-				ans = (ans + (c[i][k] * ((fac[n - i] * g[n][i]) % MOD))) % MOD;
+			if (((i - k) & 1) == 0) {
+				ans = (ans + c[i][k] * g[i] % MOD) % MOD;
 			} else {
-				ans = (ans + ((((MOD - 1) * c[i][k]) % MOD) * ((fac[n - i] * g[n][i]) % MOD))) % MOD;
+				// -1 和 (MOD-1) 同余
+				ans = (ans + c[i][k] * g[i] % MOD * (MOD - 1) % MOD) % MOD;
 			}
 		}
 		return ans;
@@ -92,7 +106,12 @@ public class Code03_NothingFear {
 			in.nextToken();
 			b[i] = (int) in.nval;
 		}
-		out.println(compute());
+		if (((n + k) & 1) == 0) {
+			k = (n + k) / 2;
+			out.println(compute());
+		} else {
+			out.println(0);
+		}
 		out.flush();
 		out.close();
 		br.close();

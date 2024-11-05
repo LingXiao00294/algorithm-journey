@@ -8,35 +8,36 @@ package class144;
 // 返回有多少种有效的划分方式
 // 1 <= n <= 10^7
 // 1 <= A[i] <= 10^7
-// 最终结果可能很大，对1000000007取余
-// 来自真实大厂笔试题，对数器验证
-public class Code04_SplitWays {
+// 最终结果可能很大，答案对 1000000007 取模
+// 来自真实大厂笔试题，该实现为对数器版本
+// 有同学找到了测试链接，就是Code04_SplitWays2文件
+public class Code04_SplitWays1 {
 
 	// 暴力方法
 	// 为了验证
 	public static int ways1(int[] arr) {
 		int ans = 0;
-		for (int a = 1, b = arr[0] - 1; a < arr[0]; a++, b--) {
-			ans += f(arr, 1, a, b);
+		for (int b = 1, c = arr[0] - 1; b < arr[0]; b++, c--) {
+			ans += f(arr, 1, b, c);
 		}
 		return ans;
 	}
 
-	public static int f(int[] arr, int i, int ip, int dp) {
+	public static int f(int[] arr, int i, int preb, int prec) {
 		if (i == arr.length) {
 			return 1;
 		}
 		int ans = 0;
-		for (int a = 1, b = arr[i] - 1; a < arr[i]; a++, b--) {
-			if (ip <= a && dp >= b) {
-				ans += f(arr, i + 1, a, b);
+		for (int b = 1, c = arr[i] - 1; b < arr[i]; b++, c--) {
+			if (preb <= b && prec >= c) {
+				ans += f(arr, i + 1, b, c);
 			}
 		}
 		return ans;
 	}
 
 	// 正式方法
-	// 转化成杨辉三角形
+	// 转化成杨辉三角
 	public static final int MOD = 1000000007;
 
 	public static int ways2(int[] arr) {
@@ -50,7 +51,7 @@ public class Code04_SplitWays {
 		if (k <= 0) {
 			return 0;
 		}
-		return c(k - 1 + n, n);
+		return c(k + n - 1, n);
 	}
 
 	// 组合公式
