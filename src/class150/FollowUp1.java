@@ -1,16 +1,9 @@
 package class150;
 
-// 替罪羊树的实现(java版)
-// 实现一种结构，支持如下操作，要求单次调用的时间复杂度O(log n)
-// 1，增加x，重复加入算多个词频
-// 2，删除x，如果有多个，只删掉一个
-// 3，查询x的排名，x的排名为，比x小的数的个数+1
-// 4，查询数据中排名为x的数
-// 5，查询x的前驱，x的前驱为，小于x的数中最大的数，不存在返回整数最小值
-// 6，查询x的后继，x的后继为，大于x的数中最小的数，不存在返回整数最大值
-// 所有操作的次数 <= 10^5
-// -10^7 <= x <= +10^7
-// 测试链接 : https://www.luogu.com.cn/problem/P3369
+// 替罪羊树实现普通有序表，数据加强的测试，java版
+// 这个文件课上没有讲，测试数据加强了，而且有强制在线的要求
+// 基本功能要求都是不变的，可以打开测试链接查看
+// 测试链接 : https://www.luogu.com.cn/problem/P6136
 // 提交以下的code，提交时请把类名改成"Main"，可以通过所有测试用例
 
 import java.io.BufferedReader;
@@ -21,40 +14,49 @@ import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.util.Arrays;
 
-public class ScapeGoat1 {
-
-	public static int MAXN = 100001;
+public class FollowUp1 {
 
 	public static double ALPHA = 0.7;
 
-	// 整棵树的头节点编号
+	public static int MAXN = 2000001;
+
 	public static int head = 0;
 
-	// 空间使用编号
 	public static int cnt = 0;
 
-	// 节点的key值
 	public static int[] key = new int[MAXN];
 
-	// 节点key的计数
 	public static int[] count = new int[MAXN];
 
-	// 左孩子
 	public static int[] left = new int[MAXN];
 
-	// 右孩子
 	public static int[] right = new int[MAXN];
 
-	// 数字总数
 	public static int[] size = new int[MAXN];
 
-	// 节点总数
 	public static int[] diff = new int[MAXN];
 
-	// 中序遍历收集节点
 	public static int[] collect = new int[MAXN];
 
 	public static int ci;
+
+	public static int top;
+
+	public static int father;
+
+	public static int side;
+
+	public static int init(int num) {
+		key[++cnt] = num;
+		left[cnt] = right[cnt] = 0;
+		count[cnt] = size[cnt] = diff[cnt] = 1;
+		return cnt;
+	}
+
+	public static void up(int i) {
+		size[i] = size[left[i]] + size[right[i]] + count[i];
+		diff[i] = diff[left[i]] + diff[right[i]] + (count[i] > 0 ? 1 : 0);
+	}
 
 	public static void inorder(int i) {
 		if (i != 0) {
@@ -64,11 +66,6 @@ public class ScapeGoat1 {
 			}
 			inorder(right[i]);
 		}
-	}
-
-	public static void up(int i) {
-		size[i] = size[left[i]] + size[right[i]] + count[i];
-		diff[i] = diff[left[i]] + diff[right[i]] + (count[i] > 0 ? 1 : 0);
 	}
 
 	public static int build(int l, int r) {
@@ -83,45 +80,56 @@ public class ScapeGoat1 {
 		return h;
 	}
 
-	public static int rebuild(int i) {
-		ci = 0;
-		inorder(i);
-		if (ci > 0) {
-			return build(1, ci);
-		} else {
-			return 0;
+	public static void rebuild() {
+		if (top != 0) {
+			ci = 0;
+			inorder(top);
+			if (ci > 0) {
+				if (father == 0) {
+					head = build(1, ci);
+				} else if (side == 1) {
+					left[father] = build(1, ci);
+				} else {
+					right[father] = build(1, ci);
+				}
+			}
 		}
 	}
 
 	public static boolean balance(int i) {
-		return ALPHA * diff[i] > Math.max(diff[left[i]], diff[right[i]]);
+		return ALPHA * diff[i] >= Math.max(diff[left[i]], diff[right[i]]);
 	}
 
-	public static void add(int num) {
-		head = add(head, num);
-	}
-
-	public static int add(int i, int num) {
+	public static void add(int i, int f, int s, int num) {
 		if (i == 0) {
-			i = ++cnt;
-			key[i] = num;
-			left[i] = right[i] = 0;
-			count[i] = size[i] = diff[i] = 1;
+			if (f == 0) {
+				head = init(num);
+			} else if (s == 1) {
+				left[f] = init(num);
+			} else {
+				right[f] = init(num);
+			}
 		} else {
 			if (key[i] == num) {
 				count[i]++;
 			} else if (key[i] > num) {
-				left[i] = add(left[i], num);
+				add(left[i], i, 1, num);
 			} else {
-				right[i] = add(right[i], num);
+				add(right[i], i, 2, num);
+			}
+			up(i);
+			if (!balance(i)) {
+				top = i;
+				father = f;
+				side = s;
 			}
 		}
-		up(i);
-		return balance(i) ? i : rebuild(i);
 	}
 
-	public static int rank(int num) {
-		return small(head, num) + 1;
+	public static void add(int num) {
+		top = father = side = 0;
+		add(head, 0, 0, num);
+		rebuild();
 	}
 
 	public static int small(int i, int num) {
@@ -135,8 +143,8 @@ public class ScapeGoat1 {
 		}
 	}
 
-	public static int index(int x) {
-		return index(head, x);
+	public static int rank(int num) {
+		return small(head, num) + 1;
 	}
 
 	public static int index(int i, int x) {
@@ -146,6 +154,10 @@ public class ScapeGoat1 {
 			return index(right[i], x - size[left[i]] - count[i]);
 		}
 		return key[i];
+	}
+
+	public static int index(int x) {
+		return index(head, x);
 	}
 
 	public static int pre(int num) {
@@ -166,22 +178,28 @@ public class ScapeGoat1 {
 		}
 	}
 
-	public static void remove(int num) {
-		if (rank(num) != rank(num + 1)) {
-			head = remove(head, num);
-		}
-	}
-
-	public static int remove(int i, int num) {
+	public static void remove(int i, int f, int s, int num) {
 		if (key[i] == num) {
 			count[i]--;
 		} else if (key[i] > num) {
-			left[i] = remove(left[i], num);
+			remove(left[i], i, 1, num);
 		} else {
-			right[i] = remove(right[i], num);
+			remove(right[i], i, 2, num);
 		}
 		up(i);
-		return balance(i) ? i : rebuild(i);
+		if (!balance(i)) {
+			top = i;
+			father = f;
+			side = s;
+		}
+	}
+
+	public static void remove(int num) {
+		if (rank(num) != rank(num + 1)) {
+			top = father = side = 0;
+			remove(head, 0, 0, num);
+			rebuild();
+		}
 	}
 
 	public static void clear() {
@@ -201,25 +219,39 @@ public class ScapeGoat1 {
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
 		in.nextToken();
 		int n = (int) in.nval;
-		for (int i = 1, op, x; i <= n; i++) {
+		in.nextToken();
+		int m = (int) in.nval;
+		for (int i = 1, num; i <= n; i++) {
+			in.nextToken();
+			num = (int) in.nval;
+			add(num);
+		}
+		int lastAns = 0;
+		int ans = 0;
+		for (int i = 1, op, x; i <= m; i++) {
 			in.nextToken();
 			op = (int) in.nval;
 			in.nextToken();
-			x = (int) in.nval;
+			x = (int) in.nval ^ lastAns;
 			if (op == 1) {
 				add(x);
 			} else if (op == 2) {
 				remove(x);
 			} else if (op == 3) {
-				out.println(rank(x));
+				lastAns = rank(x);
+				ans ^= lastAns;
 			} else if (op == 4) {
-				out.println(index(x));
+				lastAns = index(x);
+				ans ^= lastAns;
 			} else if (op == 5) {
-				out.println(pre(x));
+				lastAns = pre(x);
+				ans ^= lastAns;
 			} else {
-				out.println(post(x));
+				lastAns = post(x);
+				ans ^= lastAns;
 			}
 		}
+		out.println(ans);
 		clear();
 		out.flush();
 		out.close();

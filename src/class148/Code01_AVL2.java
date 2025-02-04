@@ -27,56 +27,56 @@ package class148;
 //int head = 0;
 //int key[MAXN];
 //int height[MAXN];
-//int leftChild[MAXN];
-//int rightChild[MAXN];
+//int ls[MAXN];
+//int rs[MAXN];
 //int key_count[MAXN];
 //int size[MAXN];
 //
 //void up(int i) {
-//    size[i] = size[leftChild[i]] + size[rightChild[i]] + key_count[i];
-//    height[i] = max(height[leftChild[i]], height[rightChild[i]]) + 1;
+//    size[i] = size[ls[i]] + size[rs[i]] + key_count[i];
+//    height[i] = max(height[ls[i]], height[rs[i]]) + 1;
 //}
 //
 //int leftRotate(int i) {
-//    int r = rightChild[i];
-//    rightChild[i] = leftChild[r];
-//    leftChild[r] = i;
+//    int r = rs[i];
+//    rs[i] = ls[r];
+//    ls[r] = i;
 //    up(i);
 //    up(r);
 //    return r;
 //}
 //
 //int rightRotate(int i) {
-//    int l = leftChild[i];
-//    leftChild[i] = rightChild[l];
-//    rightChild[l] = i;
+//    int l = ls[i];
+//    ls[i] = rs[l];
+//    rs[l] = i;
 //    up(i);
 //    up(l);
 //    return l;
 //}
 //
 //int maintain(int i) {
-//    int lh = height[leftChild[i]];
-//    int rh = height[rightChild[i]];
+//    int lh = height[ls[i]];
+//    int rh = height[rs[i]];
 //    if (lh - rh > 1) {
-//        if (height[leftChild[leftChild[i]]] >= height[rightChild[leftChild[i]]]) {
+//        if (height[ls[ls[i]]] >= height[rs[ls[i]]]) {
 //            i = rightRotate(i);
 //        } else {
-//            leftChild[i] = leftRotate(leftChild[i]);
+//            ls[i] = leftRotate(ls[i]);
 //            i = rightRotate(i);
 //        }
 //    } else if (rh - lh > 1) {
-//        if (height[rightChild[rightChild[i]]] >= height[leftChild[rightChild[i]]]) {
+//        if (height[rs[rs[i]]] >= height[ls[rs[i]]]) {
 //            i = leftRotate(i);
 //        } else {
-//            rightChild[i] = rightRotate(rightChild[i]);
+//            rs[i] = rightRotate(rs[i]);
 //            i = leftRotate(i);
 //        }
 //    }
 //    return i;
 //}
 //
-//int addNode(int i, int num) {
+//int add(int i, int num) {
 //    if (i == 0) {
 //        key[++cnt] = num;
 //        key_count[cnt] = size[cnt] = height[cnt] = 1;
@@ -85,16 +85,16 @@ package class148;
 //    if (key[i] == num) {
 //        key_count[i]++;
 //    } else if (key[i] > num) {
-//        leftChild[i] = addNode(leftChild[i], num);
+//        ls[i] = add(ls[i], num);
 //    } else {
-//        rightChild[i] = addNode(rightChild[i], num);
+//        rs[i] = add(rs[i], num);
 //    }
 //    up(i);
 //    return maintain(i);
 //}
 //
 //void add(int num) {
-//    head = addNode(head, num);
+//    head = add(head, num);
 //}
 //
 //int getRank(int i, int num) {
@@ -102,9 +102,9 @@ package class148;
 //        return 0;
 //    }
 //    if (key[i] >= num) {
-//        return getRank(leftChild[i], num);
+//        return getRank(ls[i], num);
 //    } else {
-//        return size[leftChild[i]] + key_count[i] + getRank(rightChild[i], num);
+//        return size[ls[i]] + key_count[i] + getRank(rs[i], num);
 //    }
 //}
 //
@@ -114,37 +114,37 @@ package class148;
 //
 //int removeMostLeft(int i, int mostLeft) {
 //    if (i == mostLeft) {
-//        return rightChild[i];
+//        return rs[i];
 //    } else {
-//        leftChild[i] = removeMostLeft(leftChild[i], mostLeft);
+//        ls[i] = removeMostLeft(ls[i], mostLeft);
 //        up(i);
 //        return maintain(i);
 //    }
 //}
 //
-//int removeNode(int i, int num) {
+//int remove(int i, int num) {
 //    if (key[i] < num) {
-//        rightChild[i] = removeNode(rightChild[i], num);
+//        rs[i] = remove(rs[i], num);
 //    } else if (key[i] > num) {
-//        leftChild[i] = removeNode(leftChild[i], num);
+//        ls[i] = remove(ls[i], num);
 //    } else {
 //        if (key_count[i] > 1) {
 //            key_count[i]--;
 //        } else {
-//            if (leftChild[i] == 0 && rightChild[i] == 0) {
+//            if (ls[i] == 0 && rs[i] == 0) {
 //                return 0;
-//            } else if (leftChild[i] != 0 && rightChild[i] == 0) {
-//                i = leftChild[i];
-//            } else if (leftChild[i] == 0 && rightChild[i] != 0) {
-//                i = rightChild[i];
+//            } else if (ls[i] != 0 && rs[i] == 0) {
+//                i = ls[i];
+//            } else if (ls[i] == 0 && rs[i] != 0) {
+//                i = rs[i];
 //            } else {
-//                int mostLeft = rightChild[i];
-//                while (leftChild[mostLeft] != 0) {
-//                    mostLeft = leftChild[mostLeft];
+//                int mostLeft = rs[i];
+//                while (ls[mostLeft] != 0) {
+//                    mostLeft = ls[mostLeft];
 //                }
-//                rightChild[i] = removeMostLeft(rightChild[i], mostLeft);
-//                leftChild[mostLeft] = leftChild[i];
-//                rightChild[mostLeft] = rightChild[i];
+//                rs[i] = removeMostLeft(rs[i], mostLeft);
+//                ls[mostLeft] = ls[i];
+//                rs[mostLeft] = rs[i];
 //                i = mostLeft;
 //            }
 //        }
@@ -155,21 +155,21 @@ package class148;
 //
 //void remove(int num) {
 //    if (getRank(num) != getRank(num + 1)) {
-//        head = removeNode(head, num);
+//        head = remove(head, num);
 //    }
 //}
 //
-//int getIndex(int i, int x) {
-//    if (size[leftChild[i]] >= x) {
-//        return getIndex(leftChild[i], x);
-//    } else if (size[leftChild[i]] + key_count[i] < x) {
-//        return getIndex(rightChild[i], x - size[leftChild[i]] - key_count[i]);
+//int index(int i, int x) {
+//    if (size[ls[i]] >= x) {
+//        return index(ls[i], x);
+//    } else if (size[ls[i]] + key_count[i] < x) {
+//        return index(rs[i], x - size[ls[i]] - key_count[i]);
 //    }
 //    return key[i];
 //}
 //
-//int getIndex(int x) {
-//    return getIndex(head, x);
+//int index(int x) {
+//    return index(head, x);
 //}
 //
 //int pre(int i, int num) {
@@ -177,9 +177,9 @@ package class148;
 //        return INT_MIN;
 //    }
 //    if (key[i] >= num) {
-//        return pre(leftChild[i], num);
+//        return pre(ls[i], num);
 //    } else {
-//        return max(key[i], pre(rightChild[i], num));
+//        return max(key[i], pre(rs[i], num));
 //    }
 //}
 //
@@ -192,9 +192,9 @@ package class148;
 //        return INT_MAX;
 //    }
 //    if (key[i] <= num) {
-//        return post(rightChild[i], num);
+//        return post(rs[i], num);
 //    } else {
-//        return min(key[i], post(leftChild[i], num));
+//        return min(key[i], post(ls[i], num));
 //    }
 //}
 //
@@ -205,8 +205,8 @@ package class148;
 //void clear() {
 //    memset(key + 1, 0, cnt * sizeof(int));
 //    memset(height + 1, 0, cnt * sizeof(int));
-//    memset(leftChild + 1, 0, cnt * sizeof(int));
-//    memset(rightChild + 1, 0, cnt * sizeof(int));
+//    memset(ls + 1, 0, cnt * sizeof(int));
+//    memset(rs + 1, 0, cnt * sizeof(int));
 //    memset(key_count + 1, 0, cnt * sizeof(int));
 //    memset(size + 1, 0, cnt * sizeof(int));
 //    cnt = 0;
@@ -214,6 +214,8 @@ package class148;
 //}
 //
 //int main() {
+//    ios::sync_with_stdio(false);
+//    cin.tie(nullptr);
 //    int n;
 //    cin >> n;
 //    for (int i = 1, op, x; i <= n; i++) {
@@ -225,7 +227,7 @@ package class148;
 //        } else if (op == 3) {
 //            cout << getRank(x) << endl;
 //        } else if (op == 4) {
-//            cout << getIndex(x) << endl;
+//            cout << index(x) << endl;
 //        } else if (op == 5) {
 //            cout << pre(x) << endl;
 //        } else {
