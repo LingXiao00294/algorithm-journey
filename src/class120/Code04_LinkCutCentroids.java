@@ -10,6 +10,7 @@ package class120;
 // "3 4"
 // "4 7"
 // 测试链接 : https://www.luogu.com.cn/problem/CF1406C
+// 测试链接 : https://codeforces.com/problemset/problem/1406/C
 // 提交以下的code，提交时请把类名改成"Main"，可以通过所有用例
 
 import java.io.BufferedReader;
@@ -43,11 +44,11 @@ public class Code04_LinkCutCentroids {
 	// 收集所有的重心
 	public static int[] centers = new int[2];
 
-	// 任何一个叶节点
-	public static int anyLeaf;
+	// 最大子树上的叶节点
+	public static int leaf;
 
-	// 该叶节点的父亲节点
-	public static int anyLeafFather;
+	// 叶节点的父亲节点
+	public static int leafFather;
 
 	public static void build() {
 		cnt = 1;
@@ -83,8 +84,19 @@ public class Code04_LinkCutCentroids {
 				return;
 			}
 		}
-		anyLeaf = u;
-		anyLeafFather = f;
+		leaf = u;
+		leafFather = f;
+	}
+
+	// 返回重心的数量
+	public static int centerCnt() {
+		int m = 0;
+		for (int i = 1; i <= n; i++) {
+			if (maxsub[i] <= n / 2) {
+				centers[m++] = i;
+			}
+		}
+		return m;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -105,32 +117,19 @@ public class Code04_LinkCutCentroids {
 				addEdge(u, v);
 				addEdge(v, u);
 			}
-			if (compute() == 1) {
+			dfs(1, 0);
+			if (centerCnt() == 1) {
 				out.println(centers[0] + " " + to[head[centers[0]]]);
 				out.println(centers[0] + " " + to[head[centers[0]]]);
 			} else {
-				out.println(anyLeafFather + " " + anyLeaf);
-				out.println(centers[0] + " " + anyLeaf);
+				find(centers[1], centers[0]);
+				out.println(leafFather + " " + leaf);
+				out.println(centers[0] + " " + leaf);
 			}
 		}
 		out.flush();
 		out.close();
 		br.close();
-	}
-
-	// 返回重心的数量
-	public static int compute() {
-		dfs(1, 0);
-		int m = 0;
-		for (int i = 1; i <= n; i++) {
-			if (maxsub[i] <= n / 2) {
-				centers[m++] = i;
-			}
-		}
-		if (m == 2) {
-			find(centers[1], centers[0]);
-		}
-		return m;
 	}
 
 }
